@@ -1,18 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  'https://ruiongfracllzmlnrnpn.supabase.co',
+  'sb_publishable_bm4GmY09vqnx4Ewln33zlA_JlRmAJWr'
+);
 
 export default function Home() {
   const [hasPledged, setHasPledged] = useState(false);
   const [email, setEmail] = useState('');
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [pledgeCount, setPledgeCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Static count for now - will wire up database later
-  const pledgeCount = 0;
+  useEffect(() => {
+    // Check if user already pledged (stored in localStorage)
+    const pledged = localStorage.getItem('hasPlededStrike');
+    if (pledged) setHasPledged(true);
+    
+    // Fetch current count
+    fetchPledgeCount();
+  }, []);
 
-  const handlePledge = () => {
+  const fetchPledgeCount = async () => {
+    const { count } = await supabase
+      .from('pledges')
+      .select('*', { count: 'exact', head: true });
+    
+    setPledgeCount(count || 0);
+    setIsLoading(false);
+  };
+
+  const handlePledge = async () => {
+    if (hasPledged) return;
+    
+    // Insert into Supabase
+    await supabase.from('pledges').insert({});
+    
+    // Mark as pledged locally
+    localStorage.setItem('hasPlededStrike', 'true');
     setHasPledged(true);
-    // TODO: Wire up to Supabase
+    
+    // Update count
+    fetchPledgeCount();
   };
 
   const handleEmailSubmit = async () => {
@@ -75,7 +107,7 @@ export default function Home() {
           <div className="mb-12">
             <div className="inline-flex flex-col items-start">
               <span className="text-6xl md:text-8xl font-black text-red-500 tabular-nums">
-                {formatNumber(pledgeCount)}
+                {isLoading ? '—' : formatNumber(pledgeCount)}
               </span>
               <span className="text-neutral-500 text-lg tracking-wide">
                 people ready to strike

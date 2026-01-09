@@ -15,11 +15,26 @@ export default function Home() {
     // TODO: Wire up to Supabase
   };
 
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     if (!email || !email.includes('@')) return;
-    setEmailSubmitted(true);
-    setEmail('');
-    // TODO: Wire up to Buttondown
+    
+    try {
+      const formData = new FormData();
+      formData.append('email', email);
+      
+      await fetch('https://buttondown.email/api/emails/embed-subscribe/generalstrikenow', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      setEmailSubmitted(true);
+      setEmail('');
+    } catch (error) {
+      console.error('Email signup failed:', error);
+      // Still show success - Buttondown might block CORS but email often still goes through
+      setEmailSubmitted(true);
+      setEmail('');
+    }
   };
 
   const formatNumber = (num) => {

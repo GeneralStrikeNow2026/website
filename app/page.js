@@ -88,7 +88,7 @@ export default function Home() {
       <header className="relative min-h-screen flex flex-col justify-center px-6 md:px-12 lg:px-24">
         <div className="max-w-5xl">
           <p className="text-red-500 font-mono text-sm tracking-widest mb-4 animate-pulse">
-            ENOUGH IS ENOUGH
+            IF NOT NOW, WHEN?
           </p>
           <h1 
             className="text-5xl md:text-7xl lg:text-8xl font-black leading-none tracking-tight mb-8"
